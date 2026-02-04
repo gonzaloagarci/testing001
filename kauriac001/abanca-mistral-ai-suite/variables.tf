@@ -116,18 +116,6 @@ variable "network_subnet_ip_cidr_range_services" {
   default     = "10.2.0.0/16"
 }
 
-variable "non_masquerade_cidrs" {
-  type        = list(string)
-  description = "List of CIDR ranges that should not be masqueraded by ip-masq-agent. Includes PSC endpoints, link-local addresses, and cluster network ranges (pods, nodes, services)."
-  default = [
-    "10.2.0.5/32",        # PSC private connect endpoint to google services
-    "169.254.0.0/16",     # link-local
-    "45.46.0.0/20",       # Pods Range
-    "172.24.109.192/27",  # Nodes Range
-    "34.118.224.0/20",    # Services Range
-  ]
-}
-
 variable "network_vpc_name_selflink" {
   type        = string
   description = "Network VPC selflink"

@@ -250,17 +250,6 @@ locals {
   gpu_node_pool_exists = local.gpu_node_min_count > 0
 }
 /*******************************************************************************
-Cluster addons (ip-masq + storage class)
-*******************************************************************************/
-module "cluster_addons" {
-  source = "./modules/cluster_addons"
-  count = (var.cluster_create && var.cluster_addons_create) ? 1 : 0
-  kms_crypto_key_id = local.kms_crypto_key_id
-  node_zones = local.node_zones
-  non_masquerade_cidrs = var.non_masquerade_cidrs
-  depends_on = [module.cluster]
-}
-/*******************************************************************************
   Cluster storage
 *******************************************************************************/
 /*
