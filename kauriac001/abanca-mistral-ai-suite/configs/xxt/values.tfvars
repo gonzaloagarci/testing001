@@ -22,13 +22,6 @@ network_nat_create = false
 network_subnet_ip_cidr_range_nodes = null
 network_subnet_ip_cidr_range_pods = null
 network_subnet_ip_cidr_range_services = null
-non_masquerade_cidrs = [
-  "10.2.0.5/32",        # PSC private connect endpoint to google services
-  "169.254.0.0/16",     # link-local
-  "45.46.0.0/20",       # Pods Range
-  "172.24.109.192/27",  # Nodes Range
-  "34.118.224.0/20",    # Services Range
-]
 kms_create = true
 kms_crypto_key_id = ""
 iam_create = false

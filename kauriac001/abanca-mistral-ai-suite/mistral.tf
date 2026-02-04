@@ -37,7 +37,6 @@ module "mistral" {
   network_vpc_name_selflink                  = var.network_vpc_name_selflink
   network_subnet_selflink                    = var.network_subnet_selflink
   network_private_endpoint_subnet_selflink   = var.network_private_endpoint_subnet_selflink
-  non_masquerade_cidrs                       = var.non_masquerade_cidrs
   kms_create                                 = var.kms_create
   kms_crypto_key_id                          = var.kms_crypto_key_id
   iam_create                                 = var.iam_create

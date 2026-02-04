@@ -105,18 +105,6 @@ variable "network_private_endpoint_subnet_selflink" {
   default     = null
 }
 
-variable "non_masquerade_cidrs" {
-  type        = list(string)
-  description = "List of CIDR ranges that should not be masqueraded by ip-masq-agent. Includes PSC endpoints, link-local addresses, and cluster network ranges (pods, nodes, services)."
-  default = [
-    "10.2.0.5/32",        # PSC private connect endpoint to google services
-    "169.254.0.0/16",     # link-local
-    "45.46.0.0/20",       # Pods Range
-    "172.24.109.192/27",  # Nodes Range
-    "34.118.224.0/20",    # Services Range
-  ]
-}
-
 variable "network_nat_create" {
   type        = bool
   description = "Flag to create Cloud NAT for egress internet access. Required for pulling docker images from external registries"
@@ -172,12 +160,6 @@ variable "workload_identity_bindings" {
 variable "cluster_create" {
   type        = bool
   description = "Cluster Creation flag. Set to true to create a new Cluster"
-  default     = true
-}
-
-variable "cluster_addons_create" {
-  type        = bool
-  description = "Cluster addons creation flag, ip + storage class"
   default     = true
 }
 
