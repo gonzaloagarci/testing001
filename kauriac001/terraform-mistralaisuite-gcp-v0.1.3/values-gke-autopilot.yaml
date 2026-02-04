@@ -1,0 +1,106 @@
+# GKE Autopilot Configuration for Mistral AI Suite
+#
+# This file contains configuration settings for deploying Mistral AI models on Google Kubernetes Engine (GKE) Autopilot.
+# GKE Autopilot is a managed Kubernetes service that automatically handles node provisioning and management.
+
+# We are disabling prometheus because it is not supported in GKE Autopilot environment
+# https://github.com/prometheus-community/helm-charts/issues/4833
+global:
+  mistral:
+    apps:
+      prometheus:
+        enabled: false
+      prometheus-operator:
+        enabled: false
+
+nats:
+  config: {}
+  promExporter:
+    # Disable Prometheus exporter for NATS because network-level monitoring
+    # is not available in GKE Autopilot environment
+    enabled: false
+    podMonitor:
+      enabled: false
+
+### GKE Autopilot Configuration ###
+
+# This section defines GKE Autopilot compatible node selectors for various AI models.
+# Each model requires specific GPU resources to be allocated via node selectors.
+#
+# Configuration format:
+# <model-name>:
+#   nodeSelector:
+#     cloud.google.com/gke-accelerator: "<gpu-type>"
+#     cloud.google.com/gke-accelerator-count: "<number-of-gpus>"
+
+# AI Model Configurations with GPU requirements:
+
+codestral-2503:
+  nodeSelector:
+    cloud.google.com/gke-accelerator: "nvidia-h100-80gb"
+    cloud.google.com/gke-accelerator-count: "2"
+
+codestral-embed-2505:
+  nodeSelector:
+    cloud.google.com/gke-accelerator: "nvidia-h100-80gb"
+    cloud.google.com/gke-accelerator-count: "1"
+
+devstral-small-2505:
+  nodeSelector:
+    cloud.google.com/gke-accelerator: "nvidia-h100-80gb"
+    cloud.google.com/gke-accelerator-count: "2"
+
+ministral-3b-2410:
+  nodeSelector:
+    cloud.google.com/gke-accelerator: "nvidia-h100-80gb"
+    cloud.google.com/gke-accelerator-count: "1"
+
+ministral-8b-2410:
+  nodeSelector:
+    cloud.google.com/gke-accelerator: "nvidia-h100-80gb"
+    cloud.google.com/gke-accelerator-count: "1"
+
+mistral-embed-2312:
+  nodeSelector:
+    cloud.google.com/gke-accelerator: "nvidia-h100-80gb"
+    cloud.google.com/gke-accelerator-count: "1"
+
+mistral-moderation-2411:
+  nodeSelector:
+    cloud.google.com/gke-accelerator: "nvidia-h100-80gb"
+    cloud.google.com/gke-accelerator-count: "1"
+
+mistral-ocr-2503:
+  nodeSelector:
+    cloud.google.com/gke-accelerator: "nvidia-h100-80gb"
+    cloud.google.com/gke-accelerator-count: "1"
+
+mistral-ocr-2505:
+  nodeSelector:
+    cloud.google.com/gke-accelerator: "nvidia-h100-80gb"
+    cloud.google.com/gke-accelerator-count: "1"
+
+mistral-small-2503:
+  nodeSelector:
+    cloud.google.com/gke-accelerator: "nvidia-h100-80gb"
+    cloud.google.com/gke-accelerator-count: "2"
+
+mistral-small-2506:
+  nodeSelector:
+    cloud.google.com/gke-accelerator: "nvidia-h100-80gb"
+    cloud.google.com/gke-accelerator-count: "2"
+
+mistral-medium-2505:
+  nodeSelector:
+    cloud.google.com/gke-accelerator: "nvidia-h100-80gb"
+    cloud.google.com/gke-accelerator-count: "4"
+
+mistral-large-2502:
+  nodeSelector:
+    cloud.google.com/gke-accelerator: "nvidia-h100-80gb"
+    cloud.google.com/gke-accelerator-count: "4"
+
+pixtral-large-2502:
+  nodeSelector:
+    cloud.google.com/gke-accelerator: "nvidia-h100-80gb"
+    cloud.google.com/gke-accelerator-count: "8"

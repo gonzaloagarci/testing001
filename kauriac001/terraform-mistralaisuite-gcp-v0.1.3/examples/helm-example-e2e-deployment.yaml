@@ -1,0 +1,71 @@
+
+global:
+  image:
+    registry: cdn-images.mistralai.com/docker/3rdparty
+  imagePullSecrets:
+  - name: mistral-registry 
+  imageRegistry: cdn-images.mistralai.com/docker/3rdparty
+  mistral:
+    apps:
+      albe:
+        enabled: true
+      anemo:
+        enabled: true
+      apisix:
+        enabled: true
+      cert-manager:
+        enabled: false
+      cloudnative-pg:
+        enabled: true
+      dashboard:
+        enabled: true
+      harmattan:
+        enabled: true
+      keycloak:
+        enabled: true
+      keycloak-operator:
+        enabled: true
+      le-chat:
+        enabled: true
+      nats:
+        enabled: false
+      prometheus:
+        enabled: true
+      prometheus-operator:
+        enabled: true
+      quota:
+        enabled: true
+      redis:
+        enabled: true
+      document-library:
+        enabled: false
+    baseDomain: demoonprem.app
+    buckets:
+      apps:
+        existingSecret: mai-suite-bucket-apps
+        name: <bucket-name>
+        provider: gcs
+      backups:
+        existingSecret: mai-suite-bucket-backups
+        name: <bucket-name>
+        provider: gcs
+    license:
+      key: <license-key>
+    mistral:
+      enabled: true
+    registry:
+      host: cdn-images.mistralai.com
+    models:
+      ministral-3b-2410:
+        enabled: true
+        recipes:
+          version: v0.0.162
+  sharedVolumes:
+    enabled: true
+
+le-chat:
+  config:
+    completionAPI:
+      models:
+        chat: ministral-3b-2410
+        titleGeneration: ministral-3b-2410

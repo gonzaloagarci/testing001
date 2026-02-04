@@ -1,0 +1,356 @@
+global:
+  imageRegistry: europe-southwest1-docker.pkg.dev/gc-pr-xxx-7568-kcld-repos/gc-areg-xxx-7568-kcld-kaur/docker/3rdparty
+  imagePullSecrets: []
+  image:
+    registry: europe-southwest1-docker.pkg.dev/gc-pr-xxx-7568-kcld-repos/gc-areg-xxx-7568-kcld-kaur/docker/3rdparty
+    pullSecrets: []
+    pullSecretNames: []
+  mistral:
+    registry: 
+      host: europe-southwest1-docker.pkg.dev/gc-pr-xxx-7568-kcld-repos/gc-areg-xxx-7568-kcld-kaur
+    baseDomain: kaur.webapps.test.abanca.net
+    apps:
+      albe:
+        enabled: true
+      dashboard:
+        enabled: true
+      integrations:
+        enabled: true
+      workflows:
+        enabled: true
+      apisix:
+        enabled: true
+      alloy:
+        enabled: true
+      cloudnative-pg:
+        enabled: true
+      keycloak:
+        enabled: true
+      keycloak-operator:
+        enabled: true
+      prometheus:
+        enabled: true
+      prometheus-operator:
+        enabled: true
+      nats:
+        enabled: true
+      redis:
+        enabled: true
+      tempo:
+        enabled: true
+      temporal:
+        enabled: true
+    api:
+      key:
+        value: gV6SjXydWlgln50LjIINLaMTfKNqB5Xe
+    license:
+      value: eyJidWNrZXQiOiAibW9kZWwtZGVsaXZlcnktY2M1NjgzMzgtMDEzOS00ZDYyLTllODktYjRkMTVjNWJkNmZiIiwgImFjY2Vzc19rZXlfaWQiOiAiQUtJQTNKN1FNWlpIWE5ISEdUV1ciLCAic2VjcmV0X2FjY2Vzc19rZXkiOiAiaytsQmk0blVnVksvRW9kVVB6ZTcrVTJsZkQ0MVNZdXQ1MHRLYStKUiIsICJyZWdpb24iOiAiZXUtd2VzdC0zIn0=
+    # buckets:
+    #   apps:
+    #     name: mistral-ai-suite-22lyxuey-apps
+    #     provider: gcs
+    #     endpoint: storage.googleapis.com
+    #     accessKey: ""
+    #     secretKey: ""
+    #   backups:
+    #     name: mistral-ai-suite-22lyxuey-backups
+    #     provider: gcs
+    #     endpoint: storage.googleapis.com
+    #     accessKey: ""
+    #     secretKey: ""
+
+  sharedVolume:
+    enabled: false
+
+  extraEnv: []
+
+  postgres:
+    gkeEnvironment: true
+    cluster:
+      postgresql:
+        parameters:
+          shared_buffers: 256MB
+      resources:
+        requests:
+          cpu: 1
+          memory: 1Gi
+        limits:
+          cpu: 1
+          memory: 1Gi
+      storage:
+        storageClass: mai-suite-rwo
+      serviceAccountTemplate:
+        metadata:
+          annotations:
+            iam.gke.io/gcp-service-account: gc-sa-xxt-kaur-gke-cluster-acc@gc-pr-xxt-7765-kaur-mistral.iam.gserviceaccount.com
+      inheritedMetadata:
+        annotations:
+          iam.gke.io/gcp-service-account: gc-sa-xxt-kaur-gke-cluster-acc@gc-pr-xxt-7765-kaur-mistral.iam.gserviceaccount.com
+
+cert-manager:
+  enabled: true
+
+cloudnative-pg:
+  config:
+    clusterWide: true
+  image:
+    repository: europe-southwest1-docker.pkg.dev/gc-pr-xxx-7568-kcld-repos/gc-areg-xxx-7568-kcld-kaur/docker/3rdparty/cloudnative-pg/cloudnative-pg
+
+nats:
+  podTemplate:
+    topologySpreadConstraints:
+      kubernetes.io/hostname:
+        maxSkew: 1
+        whenUnsatisfiable: "ScheduleAnyway"
+  promExporter:
+    enabled: false
+  config:
+    jetstream:
+      enabled: true
+      fileStore:
+        enabled: true
+        pvc:
+          storageClassName: mai-suite-rwo
+
+apisix:
+  etcd:
+    persistence:
+      storageClass: mai-suite-rwo
+  service:
+    loadBalancerIP: "172.24.109.227"
+    annotations:
+      networking.gke.io/load-balancer-type: Internal
+      networking.gke.io/internal-load-balancer-subnet: gc-sh-vpc-sb-xxt-internal-base-spoke-449252362511-eu-sw1-2
+
+  image:
+      ## need to be careful when bumping the version of the mistral-platform chart
+#      tag: v0.0.1-dev101
+      tag: 3.11.0-debian
+  ui:
+    enabled: true
+    image:
+      tag: 0.0.2-rc12
+
+  serviceAccount:
+    annotations:
+      iam.gke.io/gcp-service-account: gc-sa-xxt-kaur-gke-cluster-acc@gc-pr-xxt-7765-kaur-mistral.iam.gserviceaccount.com
+
+alloy:
+  controller:
+    type: deployment
+    replicas: 2
+
+tempo:
+  tempo:
+    structuredConfig:
+      memberlist:
+        abort_if_cluster_join_fails: false
+        bind_port: 7946
+        bind_addr: ['${POD_IP}']
+        advertise_addr: '${POD_IP}'
+  storage:
+    trace:
+      backend: gcs
+      gcs:
+        bucket_name:  mistral-ai-suite-22lyxuey-backups
+        endpoint: storage.googleapis.com
+        prefix: tempo
+  serviceAccount:
+    annotations:
+      iam.gke.io/gcp-service-account: gc-sa-xxt-kaur-gke-cluster-acc@gc-pr-xxt-7765-kaur-mistral.iam.gserviceaccount.com
+  ingester:
+    extraEnv:
+      - name: POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+  distributor:
+    extraEnv:
+      - name: POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+  querier:
+    extraEnv:
+      - name: POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+  compactor:
+    extraEnv:
+      - name: POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+
+
+dashboard:
+  serviceAccount:
+    annotations:
+      iam.gke.io/gcp-service-account: gc-sa-xxt-kaur-gke-cluster-acc@gc-pr-xxt-7765-kaur-mistral.iam.gserviceaccount.com
+  dashboard:
+    http:
+      resources:
+        limits:
+          cpu: 1
+          memory: 2Gi
+        requests:
+          cpu: 500m
+          memory: 1Gi
+    internal:
+      resources:
+        limits:
+          cpu: 1
+          memory: 2Gi
+        requests:
+          cpu: 500m
+          memory: 1Gi
+
+workflows-worker:
+  image:
+    tag: v0.0.1-dev88
+  apiKey:
+    mount: true
+  mistralApiKey:
+    value: gV6SjXydWlgln50LjIINLaMTfKNqB5Xe
+
+integrations:
+  test: false
+
+nats:
+  config:
+    jetstream:
+      fileStore:
+        pvc:
+          storageClassName: mai-suite-rwo
+
+redis:
+  enabled: true
+  master:
+    persistence:
+      storageClass: mai-suite-rwo
+  replica:
+    replicaCount: 1
+    persistence:
+      storageClass: mai-suite-rwo
+    initContainers:
+      - name: redis-module-preload 
+        image: europe-southwest1-docker.pkg.dev/gc-pr-xxx-7568-kcld-repos/gc-areg-xxx-7568-kcld-kaur/docker/3rdparty/redis/redis-stack-server:latest
+        command:
+          - /bin/sh
+          - -c
+          - cp /opt/redis-stack/lib/redistimeseries.so /redismodules/
+        imagePullPolicy: Always
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+          - mountPath: /redismodules/
+            name: redismodules
+  sentinel:
+    enabled: true
+    resources:
+      requests:
+        cpu: 2
+        memory: 5Gi
+      limits:
+        cpu: 2
+        memory: 5Gi	
+
+minio:
+  enabled: false
+
+prometheus-operator:
+  prometheus:
+    prometheusSpec:
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: mai-suite-rwo
+  grafana:
+    persistence:
+      storageClassName: mai-suite-rwo
+
+keycloak-operator:
+  enabled: true
+  image:
+    repository: europe-southwest1-docker.pkg.dev/gc-pr-xxx-7568-kcld-repos/gc-areg-xxx-7568-kcld-kaur/docker/3rdparty/keycloak/keycloak-operator
+  keycloakImage:
+    repository: europe-southwest1-docker.pkg.dev/gc-pr-xxx-7568-kcld-repos/gc-areg-xxx-7568-kcld-kaur/docker/3rdparty/keycloak/keycloak
+
+# global:
+#   sharedVolume:
+#     enabled: false
+#   mistral:
+#     apps:
+#       albe:
+#         enabled: true
+#       dashboard:
+#         enabled: true
+#       quota:
+#         enabled: true
+#       workflows:
+#         enabled: true
+#       alloy:
+#         enabled: true
+#       apisix:
+#         enabled: true
+#       cloudnative-pg:
+#         enabled: true
+#       keycloak:
+#         enabled: true
+#       keycloak-operator:
+#         enabled: true
+#       nats:
+#         enabled: true
+#       prometheus:
+#         enabled: true
+#       prometheus-operator:
+#         enabled: true
+#       temporal:
+#         enabled: true
+#       external-dns:
+#         enabled: true
+#       redis: 
+#         enabled: true
+#       tempo:
+#         enabled: true
+#     baseDomain: kaur.webapps.test.abanca.net
+#   tls:
+#     existingCertificateAuthority:
+#       certificate: ""
+# tempo:
+#   storage:
+#     trace:
+#       backend: gcs
+# apisix:
+#   apisix-ingress-controller:
+#     gateway:
+#       annotations:
+#         # https://cloud.google.com/kubernetes-engine/docs/concepts/service-load-balancer-parameters
+#         networking.gke.io/load-balancer-type: Internal
+#         networking.gke.io/internal-load-balancer-subnet: gc-sh-vpc-sb-xxt-internal-base-spoke-449252362511-eu-sw1-2
+# temporal:
+#   web:
+#     ingress:
+#       tls:
+#         existingCertificate: 
+#           crt: ${tls_crt}
+#           key: ${tls_key}
+# workflows:
+#   ingress:
+#     tls:
+#       existingCertificate:
+#         crt: ${tls_crt}
+#         key: ${tls_key}
+#   ui:
+#     ingress:
+#       tls:
+#         existingCertificate:
+#           crt: ${tls_crt}
+#           key: ${tls_key}
+# grafana:
+#   ingress:
+#     tls:
+#       existingCertificate:
+#         crt: ${tls_crt}
+#         key: ${tls_key}
